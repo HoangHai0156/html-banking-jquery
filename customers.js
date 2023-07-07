@@ -192,7 +192,7 @@ function showEdit(id){
     findCustomerById(id)
     .then((data) => {
 
-        $("#name-edit").val(data.name);
+        $("#name-edit").val(data.fullName);
         $("#email-edit").val(data.email);
         $("#address-edit").val(data.address);
         $("#phone-edit").val(data.phone);
@@ -211,13 +211,13 @@ btnDoEdit.on('click', doEdit);
 
 function doEdit(){
 
-    let name = $("#name-edit").val();
+    let fullName = $("#name-edit").val();
     let email = $("#email-edit").val();
     let address = $("#address-edit").val();
     let phone = $("#phone-edit").val();
 
     let customer = {
-        name,
+        fullName,
         email,
         address,
         phone
