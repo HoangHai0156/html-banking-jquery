@@ -71,7 +71,7 @@ const btnCreate = $("#btn-create");
 btnCreate.on('click', doCreate);
 
 function doCreate(){
-    var name = $("#name").val();
+    var fullName = $("#name").val();
     var email = $("#email").val();
     var address = $("#address").val();
     var phone = $("#phone").val();
@@ -79,7 +79,7 @@ function doCreate(){
     var deleted = 0;
 
     let requires = [];
-    if(name == "") requires.push("Tên không được để trống");
+    if(fullName == "") requires.push("Tên không được để trống");
     if(email == "") requires.push("Email không được để trống");
     if(address == "") requires.push("Địa chỉ không được để trống");
     if(phone == "") requires.push("Phone không được để trống");
@@ -97,7 +97,7 @@ function doCreate(){
         createDiv.html(resultStr)
     } else{
         var customer = {
-            name,
+            fullName,
             email,
             address,
             phone,
