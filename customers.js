@@ -8,7 +8,7 @@ function renderCustomer(customer){
     return `
     <tr id="row_${id}">
         <th scope="row" class="customer-id">${id}</th>
-        <td class="customer-name">${customer.name}</td>
+        <td class="customer-name">${customer.fullName}</td>
         <td class="customer-email"> ${customer.email} </td>
         <td class="customer-address">${customer.address} </td>
         <td class="customer-phone">${customer.phone} </td>
