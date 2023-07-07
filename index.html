@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customers</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="customers.css" />
+
+    <script src="https://kit.fontawesome.com/ded42364fe.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="sweetalert2.all.min.js"></script>
+    <script src="/jquery/jquery-3.7.0.min.js"></script>
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <div class="col-lg-6">
+          <h1>Customer List</h1>
+        </div>
+        <div class="col-lg-6 header-right-button">
+          <button class="btn btn-outline-light">
+            <i class="fas fa-history"></i>
+            Transfer History
+          </button>
+          <button
+            class="btn btn-outline-light"
+            data-toggle="modal"
+            data-target="#createCustomer"
+          >
+            <i class="fas fa-user-plus"></i>
+            Create Customer
+          </button>
+        </div>
+      </header>
+
+      <!-- <div th:switch="${mess}" hidden="hidden">
+            <input th:case="deleteMess" th:id="mess" value="Xóa thành công"></input>
+            <input th:case="createMess" th:id="mess" value="Thêm thành công"></input>
+            <input th:case="editMess" th:id="mess" value="Sửa thành công"></input>
+        </div>
+        <div th:if="${mess != null}" class="row d-flex justify-content-center">
+            <script th:inline="javascript">
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: document.getElementById('mess').value,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            </script>
+        </div> -->
+
+      <div class="row justify-content-center mt-5">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row justify-content-between">
+                <h4 class="header-title mb-4">Customer list</h4>
+                <li class="d-none d-lg-block">
+                  <form
+                    class="app-search"
+                    action="/customers/search"
+                    method="get"
+                  >
+                    <div class="app-search-box">
+                      <div class="input-group">
+                        <input
+                          name="kw"
+                          type="text"
+                          class="form-control"
+                          placeholder="Search..."
+                        />
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-outline-secondary"
+                            type="submit"
+                          >
+                            <i class="fas fa-search"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </li>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Address</th>
+                      <th>Phone</th>
+                      <th class="col-lg-2">Balance</th>
+                      <th class="col-lg-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="customer-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="infoCustomer"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Info Customer</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form>
+              <div class="modal-body">
+                <span> </span>
+                <div class="form-group">
+                  <label for="name-info">Name</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name-info"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email-info">Email address</label>
+                  <input
+                    type="email"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email-info"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="address-info">Address</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter address"
+                    class="form-control"
+                    id="address-info"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone-info">Phone</label>
+                  <input
+                    type="tel"
+                    readonly
+                    placeholder="Enter phone"
+                    class="form-control"
+                    id="phone-info"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="balance-info">Balance</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter balance"
+                    class="form-control"
+                    id="balance-info"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="createCustomer"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Create Customer</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form>
+              <div class="modal-body">
+                <span id="create-result"> </span>
+                <div class="form-group">
+                  <label for="name"
+                    >Name<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email"
+                    >Email address<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="address"
+                    >Address<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter address"
+                    class="form-control"
+                    id="address"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone"
+                    >Phone<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter phone"
+                    class="form-control"
+                    id="phone"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-create">
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="editCustomer"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Edit Customer</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form>
+              <div class="modal-body">
+                <span id="edit-result"> </span>
+                <div class="form-group">
+                  <label for="name-edit"
+                    >Name<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name-edit"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email-edit"
+                    >Email address<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email-edit"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="address-edit"
+                    >Address<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter address"
+                    class="form-control"
+                    id="address-edit"
+                    value=""
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone-edit"
+                    >Phone<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter phone"
+                    class="form-control"
+                    id="phone-edit"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-edit">
+                  Edit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="deposit"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Deposit</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form class="card-body">
+              <h4 class="header-title mb-4">Customer account</h4>
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="name-deposit">Name</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name-deposit"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="email-deposit">Email address</label>
+                  <input
+                    type="email"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email-deposit"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="address">Address</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="address-deposit"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="address-deposit">Phone</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="phone-deposit"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="balance-deposit">Current Balance</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter balance"
+                    class="form-control"
+                    id="balance-deposit"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="trans-amount-deposit">Transaction amount</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Transaction Amount"
+                    class="form-control"
+                    id="trans-amount-deposit"
+                  />
+                </div>
+              </div>
+              <div class="form-group text-left mb-0">
+                <button
+                  id="btn-deposit"
+                  class="btn btn-success waves-effect waves-light mr-1"
+                  type="button"
+                >
+                  <i class="fas fa-plus"></i>
+                  Deposit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="withdraw"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">withdraw</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form class="card-body" method="post">
+              <h4 class="header-title mb-4">Customer account</h4>
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="name-withdraw">Name</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name-withdraw"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="email-withdraw">Email address</label>
+                  <input
+                    type="email"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email-withdraw"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="address">Address</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="address-withdraw"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="address-withdraw">Phone</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="phone-withdraw"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="balance-withdraw">Current Balance</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter balance"
+                    class="form-control"
+                    id="balance-withdraw"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="trans-amount-withdraw">Transaction amount</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Transaction Amount"
+                    class="form-control"
+                    id="trans-amount-withdraw"
+                  />
+                </div>
+              </div>
+              <div class="form-group text-left mb-0">
+                <button
+                  id="btn-withdraw"
+                  class="btn btn-success waves-effect waves-light mr-1"
+                  type="button"
+                >
+                  <i class="fas fa-minus"></i>
+                  Withdraw
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="transfer"
+        data-backdrop="static" data-keyboard="false" 
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Transfer</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form class="card-body">
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="name-transfer">Sender Name</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter name"
+                    class="form-control"
+                    id="name-transfer"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="email-transfer">Email address</label>
+                  <input
+                    type="email"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="email-transfer"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="address-transfer">Address</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="address-transfer"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="phone-transfer">Phone</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter email"
+                    class="form-control"
+                    id="phone-transfer"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="balance-transfer">Sender Current Balance</label>
+                  <input
+                    type="text"
+                    readonly
+                    placeholder="Enter balance"
+                    class="form-control"
+                    id="balance-transfer"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="recipient-transfer">Recipient</label>
+                  <select
+                    class="form-control"
+                    name="recipient"
+                    id="recipient-transfer-id"
+                  >
+                    <option></option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="form-group col-lg-4">
+                  <label for="trans-amount-transfer">Transfer amount</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Transaction Amount"
+                    class="form-control"
+                    id="trans-amount-transfer"
+                  />
+                </div>
+                <div class="form-group col-lg-4">
+                  <label for="fees-transfer">Fees (%)</label>
+                  <input
+                    readonly
+                    type="number"
+                    class="form-control"
+                    id="fees-transfer"
+                    value="10"
+                  />
+                </div>
+
+                <div class="form-group col-lg-4">
+                  <label for="total-transfer"
+                    >Total amount of transaction</label
+                  >
+                  <input
+                    type="number"
+                    readonly
+                    class="form-control"
+                    id="total-transfer"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group text-left mb-0">
+                <button
+                  type="button"
+                  id="btn-transfer"
+                  class="btn btn-success waves-effect waves-light mr-1"
+                >
+                  <i class="fas fa-exchange-alt"></i>
+                  Transfer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="customers.js"></script>
+
+  </body>
+</html>
