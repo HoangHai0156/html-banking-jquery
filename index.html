@@ -219,7 +219,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <form>
+            <form id="create-customer-form" method="post">
               <div class="modal-body">
                 <span id="create-result"> </span>
                 <div class="form-group">
@@ -228,10 +228,10 @@
                   >
                   <input
                     type="text"
-                    required
                     placeholder="Enter name"
                     class="form-control"
                     id="name"
+                    name="name"
                     value=""
                   />
                 </div>
@@ -241,10 +241,10 @@
                   >
                   <input
                     type="email"
-                    required
                     placeholder="Enter email"
                     class="form-control"
                     id="email"
+                    name="email"
                     value=""
                   />
                 </div>
@@ -254,10 +254,10 @@
                   >
                   <input
                     type="text"
-                    required
                     placeholder="Enter address"
                     class="form-control"
                     id="address"
+                    name="address"
                     value=""
                   />
                 </div>
@@ -267,10 +267,10 @@
                   >
                   <input
                     type="tel"
-                    required
                     placeholder="Enter phone"
                     class="form-control"
                     id="phone"
+                    name="phone"
                     value=""
                   />
                 </div>
@@ -283,7 +283,7 @@
                 >
                   Close
                 </button>
-                <button type="button" class="btn btn-primary" id="btn-create">
+                <button type="submit" class="btn btn-primary" id="btn-create">
                   Create
                 </button>
               </div>
@@ -312,7 +312,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <form>
+            <form id="edit-customer-form" method="post">
               <div class="modal-body">
                 <span id="edit-result"> </span>
                 <div class="form-group">
@@ -321,10 +321,10 @@
                   >
                   <input
                     type="text"
-                    required
                     placeholder="Enter name"
                     class="form-control"
                     id="name-edit"
+                    name="name-edit"
                     value=""
                   />
                 </div>
@@ -334,10 +334,10 @@
                   >
                   <input
                     type="email"
-                    required
                     placeholder="Enter email"
                     class="form-control"
                     id="email-edit"
+                    name="email-edit"
                     value=""
                   />
                 </div>
@@ -347,10 +347,10 @@
                   >
                   <input
                     type="text"
-                    required
                     placeholder="Enter address"
                     class="form-control"
                     id="address-edit"
+                    name="address-edit"
                     value=""
                   />
                 </div>
@@ -360,10 +360,10 @@
                   >
                   <input
                     type="tel"
-                    required
                     placeholder="Enter phone"
                     class="form-control"
                     id="phone-edit"
+                    name="phone-edit"
                     value=""
                   />
                 </div>
@@ -376,7 +376,7 @@
                 >
                   Close
                 </button>
-                <button type="button" class="btn btn-primary" id="btn-edit">
+                <button type="submit" class="btn btn-primary" id="btn-edit">
                   Edit
                 </button>
               </div>
@@ -723,6 +723,7 @@
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
     <script src="./jquery/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>

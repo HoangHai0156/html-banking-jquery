@@ -17,3 +17,7 @@ header{
   display: flex !important;
   justify-content: center !important;
 }
+
+.error{
+  color: red;
+}

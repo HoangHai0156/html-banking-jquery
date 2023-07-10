@@ -32,6 +32,7 @@ const page = {
             phoneCre: $("#phone"),
             btnCreate: $("#btn-create"),
             createCusErrorsDiv : $("#create-result"),
+            createCustomerForm: $("#create-customer-form"),
 
             modalInfo: $("#infoCustomer"),
             fullNameInfo: $("#name-info"),
@@ -46,6 +47,7 @@ const page = {
             addressEdit: $("#address-edit"),
             phoneEdit: $("#phone-edit"),
             btnDoEdit: $("#btn-edit"),
+            editCustomerForm: $("#edit-customer-form"),
 
             modalDeposit: $("#deposit"),
             fullNameDep: $("#name-deposit"),
@@ -55,6 +57,7 @@ const page = {
             balanceDep: $("#balance-deposit"),
             transactionAmountDep: $("#trans-amount-deposit"),
             btnDoDeposit: $("#btn-deposit"),
+            depositForm: $("#trans-amount-deposit"),
 
             modalWithdraw: $("#withdraw"),
             fullNameWithdraw: $("#name-withdraw"),
@@ -80,7 +83,6 @@ const page = {
         commands: {}
     },
     initializeControlEvent: {
-        
     }
 }
 
@@ -88,10 +90,17 @@ page.initializeControlEvent = () => {
     page.elements.btnShowCreateCustomer.on("click", () => {
         page.dialogs.elements.modalCreateCustomer.modal("show");
         page.dialogs.elements.createCusErrorsDiv.empty();
+        page.commands.resetCreateModal();
+        page.elements.createValidator.resetForm();
     })
 
     page.dialogs.elements.btnCreate.on("click", () => {
-        page.dialogs.commands.doCreate();
+        if(page.dialogs.elements.createCustomerForm.valid()){
+            page.dialogs.elements.createCustomerForm.submit(function (e) {
+                e.preventDefault();
+            })
+            page.dialogs.commands.doCreate();
+        }
     })
     
     page.elements.tableBodyDiv.on("click", ".info", function () {
@@ -102,10 +111,16 @@ page.initializeControlEvent = () => {
     page.elements.tableBodyDiv.on("click", ".edit", function() {
         customerId = $(this).data("id");
         page.commands.showEdit(customerId);
+        page.elements.editValidator.resetForm();
     })
 
     page.dialogs.elements.btnDoEdit.on("click", () => {
-        page.dialogs.commands.doEdit();
+        if(page.dialogs.elements.editCustomerForm.valid()){
+            page.dialogs.elements.editCustomerForm.submit(function(e) {
+                e.preventDefault();
+            })
+            page.dialogs.commands.doEdit();
+        }
     })
 
     page.elements.tableBodyDiv.on("click",".deposit", function(){
@@ -204,10 +219,10 @@ page.dialogs.commands.doCreate = () => {
     var deleted = 0;
 
     let requires = [];
-    if(fullName == "") requires.push("Tên không được để trống");
-    if(email == "") requires.push("Email không được để trống");
-    if(address == "") requires.push("Địa chỉ không được để trống");
-    if(phone == "") requires.push("Phone không được để trống");
+    // if(fullName == "") requires.push("Tên không được để trống");
+    // if(email == "") requires.push("Email không được để trống");
+    // if(address == "") requires.push("Địa chỉ không được để trống");
+    // if(phone == "") requires.push("Phone không được để trống");
 
     if(requires.length > 0){
         var resultStr = ""
@@ -235,11 +250,7 @@ page.dialogs.commands.doCreate = () => {
 
             // addAllEvent();
 
-            page.dialogs.elements.fullNameCre.val("");
-            page.dialogs.elements.emailCre.val("");
-            page.dialogs.elements.addressCre.val("");
-            page.dialogs.elements.phoneCre.val("");
-
+            page.commands.resetCreateModal();
             page.dialogs.elements.modalCreateCustomer.modal("hide");
 
             App.showSuccessAlert('KH mới đã được tạo!')
@@ -248,6 +259,13 @@ page.dialogs.commands.doCreate = () => {
             console.log(errors);
         })
     }
+}
+
+page.commands.resetCreateModal = () =>{
+    page.dialogs.elements.fullNameCre.val("");
+    page.dialogs.elements.emailCre.val("");
+    page.dialogs.elements.addressCre.val("");
+    page.dialogs.elements.phoneCre.val("");
 }
 
 page.commands.showInfo = (id) => {
@@ -344,6 +362,10 @@ page.commands.showDeposit = (id) => {
     })
 }
 
+page.commands.resetDepositModal = () => {
+    page.dialogs.elements.transactionAmountDep.val("");
+}
+
 page.commands.doDeposit = () => {
     let transactionAmount = +page.dialogs.elements.transactionAmountDep.val();
 
@@ -371,8 +393,7 @@ page.commands.doDeposit = () => {
             currentRow.replaceWith(dataStr);
             // addAllEvent();
     
-            page.dialogs.elements.transactionAmountDep.val("");
-            page.dialogs.elements.balanceDep.val(data1.balance);
+            page.commands.resetDepositModal();
     
             page.dialogs.elements.modalDeposit.modal("hide");
             App.showSuccessAlert('Deposit thành công');
@@ -426,6 +447,10 @@ page.commands.showWithdraw = (id) => {
     
 }
 
+page.commands.resetWithdrawModal = () =>{
+    page.dialogs.elements.transactionAmountWithdraw.val("");
+}
+
 page.commands.doWithdraw = () => {
     var transactionAmount = +page.dialogs.elements.transactionAmountWithdraw.val();
 
@@ -453,8 +478,7 @@ page.commands.doWithdraw = () => {
             currentRow.replaceWith(dataStr);
             // addAllEvent();
     
-            page.dialogs.elements.transactionAmountWithdraw.val("");
-            page.dialogs.elements.balanceWithdraw.val(data1.balance);
+            page.commands.resetWithdrawModal();
     
             App.showSuccessAlert('Rút tiền thành công');
             page.dialogs.elements.modalWithdraw.modal("hide");
@@ -535,6 +559,11 @@ page.commands.showTransfer = (id) => {
     });
 }
 
+page.commands.resetTransferModal = () =>{
+    page.dialogs.elements.transferAmountTransfer.val("");
+    page.dialogs.elements.transactionAmountTransfer.val("");
+}
+
 page.commands.doTransfer = () => {
     let senderId = customerId;
     let recipientId = +page.dialogs.elements.recipientSelect.val();
@@ -592,8 +621,8 @@ page.commands.doTransfer = () => {
                 currentRow.replaceWith(dataStr);
                 // addAllEvent(); 
         
-                page.dialogs.elements.transferAmountTransfer.val("");
-                page.dialogs.elements.transactionAmountTransfer.val("");
+                page.commands.resetTransferModal();
+                page.dialogs.elements.modalTransfer.modal("hide");
         
                 App.showSuccessAlert('Chuyển tiền thành công');
             })
@@ -640,7 +669,15 @@ page.commands.removeCustomer = (id) => {
         deleted: 1
     }
 
-    App.showDeleteConfirmDialog().then((result) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
         if (result.isConfirmed) {
    
             $.ajax({
@@ -664,12 +701,100 @@ page.commands.removeCustomer = (id) => {
       })
 }
 
+page.elements.createValidator = page.dialogs.elements.createCustomerForm.validate({
+    rules: {
+        'name': {
+            required: true,
+            minlength: 3
+        },
+        email: {
+            email: true,
+            required: true,
+        },
+        address: {
+            required: true,
+            minlength: 3
+        },
+        phone: {
+            required: true,
+            phoneCus: true,
+        }
+    },
+    messages: {
+        'name': {
+            required: "Tên không được để trống",
+            minlength: "Tên phải ít nhất 3 ký tự"
+        },
+        email: {
+            email: "Email phải đúng định dạng abc@abc.abc",
+            required: "Email không được để trống"
+        },
+        address: {
+            required: "Địa chỉ không được để trống",
+            minlength: "Địa chỉ phải ít nhất 3 ký tự"
+        },
+        phone: {
+            required: "Điện thoại không được để trống",
+        }
+    }
+});
+
+page.elements.editValidator = page.dialogs.elements.editCustomerForm.validate({
+    rules: {
+        'name-edit': {
+            required: true,
+            minlength: 3
+        },
+        'email-edit': {
+            email: true,
+            required: true,
+        },
+        'address-edit': {
+            required: true,
+            minlength: 3
+        },
+        'phone-edit': {
+            required: true,
+            phoneCus: true,
+        }
+    },
+    messages: {
+        'name-edit': {
+            required: "Tên không được để trống",
+            minlength: "Tên phải ít nhất 3 ký tự"
+        },
+        'email-edit': {
+            email: "Email phải đúng định dạng abc@abc.abc",
+            required: "Email không được để trống"
+        },
+        'address-edit': {
+            required: "Địa chỉ không được để trống",
+            minlength: "Địa chỉ phải ít nhất 3 ký tự"
+        },
+        'phone-edit': {
+            required: "Điện thoại không được để trống",
+        }
+    }
+});
+
+page.elements.depositValidator = 
+
 page.loadData = () => {
     page.commands.showCustomers();
+
+    $.validator.addMethod("phoneCus", function(phone_number, element) {
+        return this.optional(element) || phone_number.match(/^\+1 \(\d{3}\) \d{3}-\d{4}$/);
+      }, "Vui lòng nhập số điện thoại theo định dạng +1 (xxx) xxx-xxxx");
+    // page.commands.validateAll();
+    // page.commands.validator();
+    page.elements.createValidator;
+    page.elements.editValidator;
 }
 
 $(() => {
     page.loadData();
 
     page.initializeControlEvent();
+
 })
+

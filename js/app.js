@@ -8,14 +8,14 @@ class App {
     static API_TRANSFER = this.API_SERVER + '/transfers';
   
     static showDeleteConfirmDialog() {
-      return Swal.fire({
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
         icon: 'warning',
-        text: 'Are you sure you want to delete the selected data ?',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it !',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Yes, delete it!'
       });
     }
   
