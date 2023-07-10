@@ -57,7 +57,7 @@ const page = {
             balanceDep: $("#balance-deposit"),
             transactionAmountDep: $("#trans-amount-deposit"),
             btnDoDeposit: $("#btn-deposit"),
-            depositForm: $("#trans-amount-deposit"),
+            depositForm: $("#deposit-form"),
 
             modalWithdraw: $("#withdraw"),
             fullNameWithdraw: $("#name-withdraw"),
@@ -777,6 +777,9 @@ page.elements.editValidator = page.dialogs.elements.editCustomerForm.validate({
     }
 });
 
+page.elements.depositValidator = page.dialogs.elements.depositForm.validate({
+    
+})
 
 page.loadData = () => {
     page.commands.showCustomers();
