@@ -1,9 +1,151 @@
 /// <reference path="D:\download\Code Gym\BaiTap\Module4\Module4_Hoang_Hai_C0223G1\HTML-bank-mangement\jquery\jquery-3.7.0.min.js" />
+/// <reference path="js\app.js" />
 
 let customerId = 0;
-let tableBodyDiv = $(".customer-table-body");
 
-function renderCustomer(customer){
+const page = {
+    url: {
+        getAllCustomers: App.API_CUSTOMER + '?deleted=0',
+        getCustomerById: App.API_CUSTOMER+"/",
+        createCustomer: App.API_CUSTOMER,
+        updateCustomer: App.API_CUSTOMER+"/",
+        increaseBalance: App.API_CUSTOMER+"/",
+        createDeposit: App.API_DEPOSIT,
+        decreaseBalance: App.API_CUSTOMER+"/",
+        createWithdraw: App.API_WITHDRAW,
+        createTransfer: App.API_TRANSFER,
+        getAllRecipients: App.API_CUSTOMER + "?deleted=0&id_ne=",
+        deleteCustomer: App.API_CUSTOMER+"/",
+    },
+    elements: {
+        btnShowCreateCustomer: $(".create-customer"),
+        tableBodyDiv: $(".customer-table-body"),
+    },
+    loadData: {},
+    commands: {},
+    dialogs: {
+        elements: {
+            modalCreateCustomer: $("#createCustomer"),
+            fullNameCre: $("#name"),
+            emailCre: $("#email"),
+            addressCre: $("#address"),
+            phoneCre: $("#phone"),
+            btnCreate: $("#btn-create"),
+            createCusErrorsDiv : $("#create-result"),
+
+            modalInfo: $("#infoCustomer"),
+            fullNameInfo: $("#name-info"),
+            emailInfo: $("#email-info"),
+            addressInfo: $("#address-info"),
+            phoneInfo: $("#phone-info"),
+            balanceInfo: $("#balance-info"),
+
+            modalEdit: $("#editCustomer"),
+            fullNameEdit: $("#name-edit"),
+            emailEdit: $("#email-edit"),
+            addressEdit: $("#address-edit"),
+            phoneEdit: $("#phone-edit"),
+            btnDoEdit: $("#btn-edit"),
+
+            modalDeposit: $("#deposit"),
+            fullNameDep: $("#name-deposit"),
+            emailDep : $("#email-deposit"),
+            addressDep: $("#address-deposit"),
+            phoneDep: $("#phone-deposit"),
+            balanceDep: $("#balance-deposit"),
+            transactionAmountDep: $("#trans-amount-deposit"),
+            btnDoDeposit: $("#btn-deposit"),
+
+            modalWithdraw: $("#withdraw"),
+            fullNameWithdraw: $("#name-withdraw"),
+            emailWithdraw: $("#email-withdraw"),
+            addressWithdraw: $("#address-withdraw"),
+            phoneWithdraw: $("#phone-withdraw"),
+            balanceWithdraw: $("#balance-withdraw"),
+            transactionAmountWithdraw: $("#trans-amount-withdraw"),
+            btnDoWithdraw: $("#btn-withdraw"),
+            
+            modalTransfer: $("#transfer"),
+            transferAmountTransfer: $("#trans-amount-transfer"),
+            transactionAmountTransfer: $('#total-transfer'),
+            fullNameTrans: $("#name-transfer"),
+            emailTrans: $("#email-transfer"),
+            addressTrans: $("#address-transfer"),
+            phoneTrans: $("#phone-transfer"),
+            balanceTrans: $("#balance-transfer"),
+            recipientSelect: $("#recipient-transfer-id"),
+            btnDoTransfer: $("#btn-transfer"),
+
+        },
+        commands: {}
+    },
+    initializeControlEvent: {
+        
+    }
+}
+
+page.initializeControlEvent = () => {
+    page.elements.btnShowCreateCustomer.on("click", () => {
+        page.dialogs.elements.modalCreateCustomer.modal("show");
+        page.dialogs.elements.createCusErrorsDiv.empty();
+    })
+
+    page.dialogs.elements.btnCreate.on("click", () => {
+        page.dialogs.commands.doCreate();
+    })
+    
+    page.elements.tableBodyDiv.on("click", ".info", function () {
+        customerId = $(this).data("id");
+        page.commands.showInfo(customerId);
+    })
+
+    page.elements.tableBodyDiv.on("click", ".edit", function() {
+        customerId = $(this).data("id");
+        page.commands.showEdit(customerId);
+    })
+
+    page.dialogs.elements.btnDoEdit.on("click", () => {
+        page.dialogs.commands.doEdit();
+    })
+
+    page.elements.tableBodyDiv.on("click",".deposit", function(){
+        customerId = $(this).data('id');
+        page.commands.showDeposit(customerId);
+    })
+
+    page.dialogs.elements.btnDoDeposit.on("click", () => {
+        page.commands.doDeposit();
+    })
+
+    page.elements.tableBodyDiv.on("click", ".withdraw", function () {
+        customerId = $(this).data('id');
+        page.commands.showWithdraw(customerId);
+    })
+
+    page.dialogs.elements.btnDoWithdraw.on("click", () => {
+        page.commands.doWithdraw();
+    })
+
+    page.dialogs.elements.transferAmountTransfer.on("input", () => {
+        page.commands.calculateTotal();
+    })
+
+    page.elements.tableBodyDiv.on("click", ".transfer", function(){
+        customerId = $(this).data('id');
+        page.commands.showTransfer(customerId);
+    })
+
+    page.dialogs.elements.btnDoTransfer.on("click", () => {
+        page.commands.doTransfer();
+    })
+
+    page.elements.tableBodyDiv.on("click", ".remove", function () {
+        customerId = $(this).data('id');
+        page.commands.removeCustomer();
+    })
+}
+
+page.commands.renderCustomer = (customer) => {
     var id = customer.id;
     return `
     <tr id="row_${id}">
@@ -31,30 +173,19 @@ function renderCustomer(customer){
     `;
 }
 
-function addAllEvent(){
-    addEventShowModalEdit();
-    addEventShowModalInfo();
-    addEventShowModalDeposit();
-    addEventShowModalWithdraw();
-    addEventShowModalTransfer();
-    addEventRemove();
-}
-
-showCustomers();
-function showCustomers(){
-    
-    tableBodyDiv.empty();
+page.commands.showCustomers = () => {
+    page.elements.tableBodyDiv.empty();
 
     $.ajax({
         type: "GET",
-        url: "http://localhost:3000/customers?deleted=0"
+        url: page.url.getAllCustomers
     })
     .done((data) => {
         data.forEach(item => {
-            const dataStr = renderCustomer(item);
-            tableBodyDiv.prepend(dataStr);
+            const dataStr = page.commands.renderCustomer(item);
+            page.elements.tableBodyDiv.prepend(dataStr);
 
-            addAllEvent();
+            // addAllEvent();
         });
     })
     .fail((errors) => {
@@ -62,19 +193,13 @@ function showCustomers(){
     })
     ;
 
-    let createDiv = $("#create-result");
-    createDiv.innerHTML = "";
-
 }
 
-const btnCreate = $("#btn-create");
-btnCreate.on('click', doCreate);
-
-function doCreate(){
-    var fullName = $("#name").val();
-    var email = $("#email").val();
-    var address = $("#address").val();
-    var phone = $("#phone").val();
+page.dialogs.commands.doCreate = () => {
+    var fullName = page.dialogs.elements.fullNameCre.val();
+    var email = page.dialogs.elements.emailCre.val();
+    var address = page.dialogs.elements.addressCre.val();
+    var phone = page.dialogs.elements.phoneCre.val();
     var balance = 0;
     var deleted = 0;
 
@@ -84,9 +209,6 @@ function doCreate(){
     if(address == "") requires.push("Địa chỉ không được để trống");
     if(phone == "") requires.push("Phone không được để trống");
 
-    let createDiv = $("#create-result");
-    createDiv.empty();
-
     if(requires.length > 0){
         var resultStr = ""
         for(var i = 0; i < requires.length; i++){
@@ -94,16 +216,9 @@ function doCreate(){
             <p class="alert alert-danger">${requires[i]}</p>
             `;
         }
-        createDiv.html(resultStr)
+        page.dialogs.elements.createCusErrorsDiv.html(resultStr)
     } else{
-        var customer = {
-            fullName,
-            email,
-            address,
-            phone,
-            balance,
-            deleted
-        };
+        let customer = new Customer(null,fullName,email,phone,balance,address,deleted)
 
         $.ajax({
             headers: {
@@ -111,26 +226,23 @@ function doCreate(){
                 'content-type': 'application/json'
             },
             type: 'POST',
-            url: 'http://localhost:3000/customers',
+            url: page.url.createCustomer,
             data: JSON.stringify(customer)
         })
         .done((data) => {
-            let dataStr = renderCustomer(data);
-            tableBodyDiv.prepend(dataStr);
+            let dataStr = page.commands.renderCustomer(data);
+            page.elements.tableBodyDiv.prepend(dataStr);
 
-            addAllEvent();
+            // addAllEvent();
 
-            $("#name").val("");
-            $("#email").val("");
-            $("#address").val("");
-            $("#phone").val("");
+            page.dialogs.elements.fullNameCre.val("");
+            page.dialogs.elements.emailCre.val("");
+            page.dialogs.elements.addressCre.val("");
+            page.dialogs.elements.phoneCre.val("");
 
-            Swal.fire(
-                'Create Successfully!',
-                'KH mới đã được tạo!',
-                'success'
-            )
+            page.dialogs.elements.modalCreateCustomer.modal("hide");
 
+            App.showSuccessAlert('KH mới đã được tạo!')
         })
         .fail((errors) => {
             console.log(errors);
@@ -138,66 +250,39 @@ function doCreate(){
     }
 }
 
-function addEventShowModalInfo(){
-    // all query select
-    let btnInfo = $(".info");
-
-    btnInfo.off('click');
-    btnInfo.on('click',function() {
-        console.log("click-info");
-
-        customerId = $(this).data('id');
-
-        showInfo(customerId);
-    })
-}
-
-function showInfo(id){
-    console.log("show-info");
-    findCustomerById(id)
+page.commands.showInfo = (id) => {
+    page.commands.findCustomerById(id)
     .then((data) => {
-        $("#name-info").val(data.name);
-        $("#email-info").val(data.email);
-        $("#address-info").val(data.address);
-        $("#phone-info").val(data.phone);
-        $("#balance-info").val(data.balance);
+        page.dialogs.elements.fullNameInfo.val(data.fullName);
+        page.dialogs.elements.emailInfo.val(data.email);
+        page.dialogs.elements.addressInfo.val(data.address);
+        page.dialogs.elements.phoneInfo.val(data.phone);
+        page.dialogs.elements.balanceInfo.val(data.balance);
 
-        $('#infoCustomer').modal('show');
+        page.dialogs.elements.modalInfo.modal('show');
     })
     .catch((error) => {
         console.log(error);
     });
 }
 
-function findCustomerById(id) {
+page.commands.findCustomerById = (id) => {
     return $.ajax({
         type: "GET",
-        url: "http://localhost:3000/customers/"+id,
+        url: page.url.getCustomerById+id,
     });
 }
 
-function addEventShowModalEdit(){
-    // all query select
-    let btnShowEdit = $(".edit");
-
-    btnShowEdit.off('click');
-    btnShowEdit.on('click', function(){
-
-        customerId = $(this).data('id');
-        showEdit(customerId);
-    })
-}
-
-function showEdit(id){
-    findCustomerById(id)
+page.commands.showEdit = (id) => {
+    page.commands.findCustomerById(id)
     .then((data) => {
 
-        $("#name-edit").val(data.fullName);
-        $("#email-edit").val(data.email);
-        $("#address-edit").val(data.address);
-        $("#phone-edit").val(data.phone);
+        page.dialogs.elements.fullNameEdit.val(data.fullName);
+        page.dialogs.elements.emailEdit.val(data.email);
+        page.dialogs.elements.addressEdit.val(data.address);
+        page.dialogs.elements.phoneEdit.val(data.phone);
 
-        $('#editCustomer').modal('show');
+        page.dialogs.elements.modalEdit.modal('show');
 
     })
     .catch((errors) => {
@@ -206,15 +291,13 @@ function showEdit(id){
 
 }
 
-const btnDoEdit = $("#btn-edit");
-btnDoEdit.on('click', doEdit);
 
-function doEdit(){
+page.dialogs.commands.doEdit = () => {
 
-    let fullName = $("#name-edit").val();
-    let email = $("#email-edit").val();
-    let address = $("#address-edit").val();
-    let phone = $("#phone-edit").val();
+    let fullName = page.dialogs.elements.fullNameEdit.val();
+    let email = page.dialogs.elements.emailEdit.val();
+    let address = page.dialogs.elements.addressEdit.val();
+    let phone = page.dialogs.elements.phoneEdit.val();
 
     let customer = {
         fullName,
@@ -229,61 +312,42 @@ function doEdit(){
             'content-type': 'application/json'
         },
         type: "PATCH",
-        url: 'http://localhost:3000/customers/'+customerId,
+        url: page.url.updateCustomer+customerId,
         data: JSON.stringify(customer)
     })
     .done((data) => {
-        let dataStr = renderCustomer(data);
+        let dataStr = page.commands.renderCustomer(data);
         let currentRow = $("#row_"+customerId);
 
         currentRow.replaceWith(dataStr);
-        addAllEvent();
+        page.dialogs.elements.modalEdit.modal("hide");
+        // addAllEvent();
         
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Edit thành công',
-            showConfirmButton: false,
-            timer: 1500
-        })
+        App.showSuccessAlert('Edit thành công');
     })
 
 }
 
-function addEventShowModalDeposit(){
-    // all query select
-    let btnShowDeposit = $('.deposit');
-
-    btnShowDeposit.off('click');
-    btnShowDeposit.on('click',function() {
-        $('#deposit').modal('show');
-
-        customerId = $(this).data('id');
-        showDeposit(customerId);
-    })
-}
-
-function showDeposit(id){
-    findCustomerById(id)
+page.commands.showDeposit = (id) => {
+    page.commands.findCustomerById(id)
     .then((data) => {
-        $("#name-deposit").val(data.name);
-        $("#email-deposit").val(data.email);
-        $("#address-deposit").val(data.address);
-        $("#phone-deposit").val(data.phone);
-        $("#balance-deposit").val(data.balance);
+        page.dialogs.elements.fullNameDep.val(data.fullName);
+        page.dialogs.elements.emailDep.val(data.email);
+        page.dialogs.elements.addressDep.val(data.address);
+        page.dialogs.elements.phoneDep.val(data.phone);
+        page.dialogs.elements.balanceDep.val(data.balance);
+
+        page.dialogs.elements.modalDeposit.modal("show");
     })
     .catch((errors) => {
         console.log(errors);
     })
 }
 
-const btnDoDeposit = $("#btn-deposit");
-btnDoDeposit.on('click', doDeposit);
+page.commands.doDeposit = () => {
+    let transactionAmount = +page.dialogs.elements.transactionAmountDep.val();
 
-function doDeposit(){
-    let transactionAmount = +$("#trans-amount-deposit").val();
-
-    findCustomerById(customerId)
+    page.commands.findCustomerById(customerId)
     .then((data) => {
         let balance = data.balance + transactionAmount;
 
@@ -297,26 +361,21 @@ function doDeposit(){
                 'content-type': 'application/json'
             },
             type: 'PATCH',
-            url: 'http://localhost:3000/customers/'+customerId,
+            url: page.url.increaseBalance+customerId,
             data: JSON.stringify(customer)
         })
         .done((data1) => {
-            let dataStr = renderCustomer(data1);
+            let dataStr = page.commands.renderCustomer(data1);
             let currentRow = $("#row_"+customerId);
     
             currentRow.replaceWith(dataStr);
-            addAllEvent();
+            // addAllEvent();
     
-            $("#trans-amount-deposit").val("");
-            $("#balance-deposit").val(data1.balance);
+            page.dialogs.elements.transactionAmountDep.val("");
+            page.dialogs.elements.balanceDep.val(data1.balance);
     
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Deposit thành công',
-                showConfirmButton: false,
-                timer: 1500
-            })
+            page.dialogs.elements.modalDeposit.modal("hide");
+            App.showSuccessAlert('Deposit thành công');
         })
         .fail((errors) => {
             console.log(errors);
@@ -333,7 +392,7 @@ function doDeposit(){
                 'content-type': 'application/json'
             },
             type: 'POST',
-            url: "http://localhost:3000/deposits",
+            url: page.url.createDeposit,
             data: JSON.stringify(deposit)
         })
         .done((data))
@@ -350,14 +409,16 @@ function doDeposit(){
     
 }
 
-function showWithdraw(id){
-    findCustomerById(id)
+page.commands.showWithdraw = (id) => {
+    page.commands.findCustomerById(id)
     .then((data) => {
-        $("#name-withdraw").val(data.name);
-        $("#email-withdraw").val(data.email);
-        $("#address-withdraw").val(data.address);
-        $("#phone-withdraw").val(data.phone);
-        $("#balance-withdraw").val(data.balance);
+        page.dialogs.elements.fullNameWithdraw.val(data.fullName);
+        page.dialogs.elements.emailWithdraw.val(data.email);
+        page.dialogs.elements.addressWithdraw.val(data.address);
+        page.dialogs.elements.phoneWithdraw.val(data.phone);
+        page.dialogs.elements.balanceWithdraw.val(data.balance);
+
+        page.dialogs.elements.modalWithdraw.modal("show");
     })
     .catch((errors) => {
         console.log(errors);
@@ -365,26 +426,10 @@ function showWithdraw(id){
     
 }
 
-function addEventShowModalWithdraw(){
-    // all query select
-    let btnShowWithdraw = $(".withdraw");
+page.commands.doWithdraw = () => {
+    var transactionAmount = +page.dialogs.elements.transactionAmountWithdraw.val();
 
-    btnShowWithdraw.off('click');
-    btnShowWithdraw.on('click', function(){
-        $('#withdraw').modal('show');
-
-        customerId = $(this).data('id');
-        showWithdraw(customerId);
-    })
-}
-
-const btnDoWithdraw = $("#btn-withdraw");
-btnDoWithdraw.on('click', doWithdraw);
-
-function doWithdraw(){
-    var transactionAmount = +$("#trans-amount-withdraw").val();
-
-    findCustomerById(customerId)
+    page.commands.findCustomerById(customerId)
     .then((data) => {
         let balance = data.balance - transactionAmount;
 
@@ -402,22 +447,17 @@ function doWithdraw(){
             data: JSON.stringify(customer)
         })
         .done((data1) => {
-            let dataStr = renderCustomer(data1);
+            let dataStr = page.commands.renderCustomer(data1);
             let currentRow = $("#row_"+customerId);
     
             currentRow.replaceWith(dataStr);
-            addAllEvent();
+            // addAllEvent();
     
-            $("#trans-amount-withdraw").val("");
-            $("#balance-withdraw").val(data1.balance);
+            page.dialogs.elements.transactionAmountWithdraw.val("");
+            page.dialogs.elements.balanceWithdraw.val(data1.balance);
     
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Rút tiền thành công',
-                showConfirmButton: false,
-                timer: 1500
-            })
+            App.showSuccessAlert('Rút tiền thành công');
+            page.dialogs.elements.modalWithdraw.modal("hide");
         })
         .fail((errors) => {
             console.log(errors);
@@ -434,7 +474,7 @@ function doWithdraw(){
                 'content-type': 'application/json'
             },
             type: 'POST',
-            url: "http://localhost:3000/withdraws",
+            url: page.url.createWithdraw,
             data: JSON.stringify(withdraw)
         })
         .done((data))
@@ -449,58 +489,41 @@ function doWithdraw(){
 
 }
 
-const inpTransAmount = $("#trans-amount-transfer");
-inpTransAmount.on('input',calculateTotal)
-
-function calculateTotal(){
-    amount = $("#trans-amount-transfer").val();
+page.commands.calculateTotal = () => {
+    amount = page.dialogs.elements.transferAmountTransfer.val();
     let amountNum = parseFloat(amount);
-    $('#total-transfer').val(amountNum + (amountNum * 0.1));
+    page.dialogs.elements.transactionAmountTransfer.val(amountNum + (amountNum * 0.1));
 }
 
-function addEventShowModalTransfer(){
-    // all query select
-    let btnShowTransfer = $(".transfer");
-
-    btnShowTransfer.off('click');
-    btnShowTransfer.on("click", function() {
-        $('#transfer').modal('show');
-
-        customerId = $(this).data('id');
-        showTransfer(customerId);
-    })
-}
-
-function renderRecipientOption(recipient){
+page.commands.renderRecipientOption = (recipient) => {
     return  `
-    <option value="${recipient.id} ">${recipient.name} </option>
+    <option value="${recipient.id} ">${recipient.fullName} </option>
     `;
 }
 
-function showTransfer(id){
-    
-    let recipientSelect = $("#recipient-transfer-id");
+page.commands.showTransfer = (id) => {
+    page.commands.findCustomerById(id).then((data) => {
 
-    findCustomerById(id).then((data) => {
+        page.dialogs.elements.fullNameTrans.val(data.fullName);
+        page.dialogs.elements.emailTrans.val(data.email);
+        page.dialogs.elements.addressTrans.val(data.address);
+        page.dialogs.elements.phoneTrans.val(data.phone);
+        page.dialogs.elements.balanceTrans.val(data.balance);
 
-        $("#name-transfer").val(data.name);
-        $("#email-transfer").val(data.email);
-        $("#address-transfer").val(data.address);
-        $("#phone-transfer").val(data.phone);
-        $("#balance-transfer").val(data.balance);
+        page.dialogs.elements.modalTransfer.modal('show');
 
         $.ajax({
             type: "GET",
-            url: "http://localhost:3000/customers?id_ne="+id,
+            url: page.url.getAllRecipients+id,
         })
         .done((recipients) => {
             console.log(recipients);
 
-            recipientSelect.empty();
+            page.dialogs.elements.recipientSelect.empty();
             recipients.forEach(item => {
-                let recStr = renderRecipientOption(item);
+                let recStr = page.commands.renderRecipientOption(item);
                 console.log(recStr);
-                recipientSelect.append(recStr);
+                page.dialogs.elements.recipientSelect.append(recStr);
             })
         })
         .fail((errors1) => {
@@ -512,20 +535,17 @@ function showTransfer(id){
     });
 }
 
-const btnDoTransfer = $("#btn-transfer");
-btnDoTransfer.on("click",doTransfer);
-
-function doTransfer(){
+page.commands.doTransfer = () => {
     let senderId = customerId;
-    let recipientId = +$("#recipient-transfer-id").val();
+    let recipientId = +page.dialogs.elements.recipientSelect.val();
 
-    var transAmount = +$("#trans-amount-transfer").val();
+    var transAmount = +page.dialogs.elements.transferAmountTransfer.val();
     var totalTransAmount = transAmount*1.1;
 
     let senderBalance;
     let recipientBalance;
 
-    findCustomerById(senderId)
+    page.commands.findCustomerById(senderId)
     .then((data) => {
         senderBalance = data.balance - totalTransAmount;
         let newSender = {
@@ -538,20 +558,20 @@ function doTransfer(){
                 'content-type': 'application/json'
             },
             type: "PATCH",
-            url: 'http://localhost:3000/customers/'+senderId,
+            url: page.url.decreaseBalance+senderId,
             data: JSON.stringify(newSender)
         })
         .done((data2) => {
-            let dataStr = renderCustomer(data2);
+            let dataStr = page.commands.renderCustomer(data2);
             let currentRow = $("#row_"+senderId);
     
             currentRow.replaceWith(dataStr);
-            $("#balance-transfer").val(senderBalance);
+            page.dialogs.elements.balanceTrans.val(senderBalance);
 
-            addAllEvent(); 
+            // addAllEvent(); 
         })
 
-        findCustomerById(recipientId).then((data1) => {
+        page.commands.findCustomerById(recipientId).then((data1) => {
             recipientBalance = data1.balance + transAmount;
             let newRecipient = {
                 balance : recipientBalance
@@ -562,26 +582,20 @@ function doTransfer(){
                     'content-type': 'application/json'
                 },
                 type: "PATCH",
-                url: 'http://localhost:3000/customers/'+recipientId,
+                url: page.url.increaseBalance+recipientId,
                 data: JSON.stringify(newRecipient)
             })
             .done((data3) => {
-                let dataStr = renderCustomer(data3);
+                let dataStr = page.commands.renderCustomer(data3);
                 let currentRow = $("#row_"+recipientId);
         
                 currentRow.replaceWith(dataStr);
-                addAllEvent(); 
+                // addAllEvent(); 
         
-                $("#trans-amount-transfer").val("");
-                $("#total-transfer").val("");
+                page.dialogs.elements.transferAmountTransfer.val("");
+                page.dialogs.elements.transactionAmountTransfer.val("");
         
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Chuyển tiền thành công',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
+                App.showSuccessAlert('Chuyển tiền thành công');
             })
 
             let transfer = {
@@ -598,7 +612,7 @@ function doTransfer(){
                     'content-type': 'application/json'
                 },
                 type: "POST",
-                url: "http://localhost:3000/transfers",
+                url: page.url.createTransfer,
                 data: JSON.stringify(transfer)
             })
             .done((data) => {
@@ -621,31 +635,12 @@ function doTransfer(){
     
 }
 
-function addEventRemove(){
-    // all query select
-    let btnRemove = $(".remove");
-
-    btnRemove.off('click');
-    btnRemove.on("click",function(){
-            customerId = $(this).data('id');
-            removeCustomer(customerId);
-        })
-}
-
-function removeCustomer(id){
+page.commands.removeCustomer = (id) => {
     let customer = {
         deleted: 1
     }
 
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
+    App.showDeleteConfirmDialog().then((result) => {
         if (result.isConfirmed) {
    
             $.ajax({
@@ -654,16 +649,12 @@ function removeCustomer(id){
                     'content-type': 'application/json'
                 },
                 type: "PATCH",
-                url: "http://localhost:3000/customers/"+customerId,
+                url: page.url.deleteCustomer+customerId,
                 data: JSON.stringify(customer),
             })
             .done((data) => {
 
-                Swal.fire(
-                    'Deleted!',
-                    'Your file has been deleted.',
-                    'success'
-                )
+                App.showSuccessAlert('Xóa KH thành công!')
 
                 let currentRow = $("#row_"+customerId);
                 currentRow.remove();
@@ -672,3 +663,13 @@ function removeCustomer(id){
         }
       })
 }
+
+page.loadData = () => {
+    page.commands.showCustomers();
+}
+
+$(() => {
+    page.loadData();
+
+    page.initializeControlEvent();
+})
