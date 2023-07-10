@@ -67,6 +67,7 @@ const page = {
             balanceWithdraw: $("#balance-withdraw"),
             transactionAmountWithdraw: $("#trans-amount-withdraw"),
             btnDoWithdraw: $("#btn-withdraw"),
+            withdrawForm: $("#withdraw-form"),
             
             modalTransfer: $("#transfer"),
             transferAmountTransfer: $("#trans-amount-transfer"),
@@ -126,10 +127,16 @@ page.initializeControlEvent = () => {
     page.elements.tableBodyDiv.on("click",".deposit", function(){
         customerId = $(this).data('id');
         page.commands.showDeposit(customerId);
+        page.elements.depositValidator.resetForm();
     })
 
     page.dialogs.elements.btnDoDeposit.on("click", () => {
-        page.commands.doDeposit();
+        if(page.dialogs.elements.depositForm.valid()){
+            page.dialogs.elements.depositForm.submit(function(e) {
+                e.preventDefault();
+            })
+            page.commands.doDeposit();
+        }
     })
 
     page.elements.tableBodyDiv.on("click", ".withdraw", function () {
@@ -138,7 +145,12 @@ page.initializeControlEvent = () => {
     })
 
     page.dialogs.elements.btnDoWithdraw.on("click", () => {
-        page.commands.doWithdraw();
+        if(page.dialogs.elements.withdrawForm.valid()){
+            page.dialogs.elements.withdrawForm.submit(function(e) {
+                e.preventDefault();
+            })
+            page.commands.doWithdraw();
+        }
     })
 
     page.dialogs.elements.transferAmountTransfer.on("input", () => {
@@ -778,7 +790,34 @@ page.elements.editValidator = page.dialogs.elements.editCustomerForm.validate({
 });
 
 page.elements.depositValidator = page.dialogs.elements.depositForm.validate({
-    
+    rules: {
+        'trans-amount-deposit': {
+            required: true,
+            min: 1000,
+        }
+    },
+    messages: {
+        'trans-amount-deposit': {
+            required: "Tiền nạp vào không được để trống",
+            min: "Tiền nạp vào ít nhất 1000",
+        }
+    }
+})
+page.elements.withdrawValidator = page.dialogs.elements.withdrawForm.validate({
+    rules: {
+        'trans-amount-withdraw': {
+            required: true,
+            min: 1000,
+            max: page.dialogs.elements.balanceWithdraw.val(),
+        }
+    },
+    messages: {
+        'trans-amount-withdraw': {
+            required: "Tiền rút không được để trống",
+            min: "Tiền rút ít nhất 1000",
+            max: "Tiền rút không được quá số dư",
+        }
+    }
 })
 
 page.loadData = () => {
@@ -791,6 +830,8 @@ page.loadData = () => {
     // page.commands.validator();
     page.elements.createValidator;
     page.elements.editValidator;
+    page.elements.depositValidator;
+    page.elements.withdrawValidator;
 }
 
 $(() => {
