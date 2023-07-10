@@ -777,7 +777,6 @@ page.elements.editValidator = page.dialogs.elements.editCustomerForm.validate({
     }
 });
 
-page.elements.depositValidator = 
 
 page.loadData = () => {
     page.commands.showCustomers();
