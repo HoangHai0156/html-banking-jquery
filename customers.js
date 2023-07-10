@@ -808,14 +808,14 @@ page.elements.withdrawValidator = page.dialogs.elements.withdrawForm.validate({
         'trans-amount-withdraw': {
             required: true,
             min: 1000,
-            max: page.dialogs.elements.balanceWithdraw.val(),
+            // max: +page.dialogs.elements.balanceWithdraw.val(),
         }
     },
     messages: {
         'trans-amount-withdraw': {
             required: "Tiền rút không được để trống",
             min: "Tiền rút ít nhất 1000",
-            max: "Tiền rút không được quá số dư",
+            // max: "Tiền rút không được quá số dư",
         }
     }
 })
